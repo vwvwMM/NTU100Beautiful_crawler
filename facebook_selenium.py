@@ -15,8 +15,8 @@ driver.get("https://www.facebook.com/")
 acc = driver.find_element_by_xpath(
     '//*[@id="email"]')
 psw = driver.find_element_by_xpath('//*[@id="pass"]')
-acc.send_keys('x28150867@yahoo.com.tw')
-psw.send_keys('Eric0620eric')
+acc.send_keys('< youraccount >')
+psw.send_keys('< yourpassword > ')
 
 
 driver.find_element_by_class_name('_6ltg').click()
