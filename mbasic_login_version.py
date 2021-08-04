@@ -6,7 +6,7 @@ import time
 
 BASE_URL = 'https://mbasic.facebook.com/'
 LOGIN_URL = 'https://mbasic.facebook.com/login/device-based/regular/login/?refsrc=deprecated&lwv=100&refid=8'
-USERNAME = 'ttttrickortreat@gmail.com.tw'
+USERNAME = 'ttttrickortreat@gmail.com'
 PASSWORD = 'Eric0620eric'
 
 
@@ -46,62 +46,82 @@ def LOGGER(username, password):
 # access
 
 
-soup = LOGGER(USERNAME, PASSWORD)
-spe_url = soup.find('form', {'method': 'post'})['action']
-JAZO = soup.find('input', {'name': 'jazoest'})['value']
-FBDTSG = soup.find('input', {'name': 'fb_dtsg'})['value']
-FLOW = soup.find('input', {'name': 'flow'})['value']
-NUXSOURCE = soup.find('input', {'name': 'nux_source'})['value']
-form_data = {
-    'fb_dtsg': FBDTSG,
-    'jazoest': JAZO,
-    'flow': FLOW,
-    'nux_source': NUXSOURCE
-}
-session.headers.update({'authority': 'mbasic.facebook.com'})
-resp = session.post(LOGIN_URL, data=form_data)
-soup = BeautifulSoup(resp.text, 'html5lib')
-st = soup.find('a')['href']
-num = 0
-if str.split('refid')[-1]:
-    num = st.split('refid=')[-1]
-
-STRING = '台大百大正妹'
-STRING = str(STRING.encode('utf-8'))[2:-1]
-# search
-
-NUMBER = str(100)
-STRING = STRING.replace('\\x', '%')
-SEARCH_URL = 'https://mbasic.facebook.com/hashtag/'+'台大百大正妹ntu100beauty'+NUMBER
-PARAMS = {
-    'refid': num,
-    'query': ('#'+STRING+NUMBER)
-}
-
-
 def post_scraper(search_url, query_params):
 
-    resp = session.get('search_url', params=query_params)
+    resp = session.get(search_url, params=query_params)
     soup = BeautifulSoup(resp.text, 'html5lib')
-    paragraph = soup.find('div', {'id': 'objects_container'}
-                          ).find_all('a')[1].parent.next_sibling.text
-    IMG = {}
+    IMFS = {}
+    if soup.find('h3'):
+        IMFS[0] = soup.find('div', {'id': 'objects_container'}).find_all('a')[
+            1].parent.next_sibling.text
+    else:
+        IMFS[0] = 'deleted post'
+        print('This post has been deleted.')
+        return IMFS
+    # use second pic because sometimes the first links to other posts
     img_url = soup.paragraph = soup.find('div', {'id': 'objects_container'}).find_all(
-        'a')[1].parent.parent.parent.parent.next_sibling.find('a')['href']
+        'a')[1].parent.parent.parent.parent.next_sibling.find_all('a')[1]['href']
     resp = session.get(BASE_URL+img_url)
     soup = BeautifulSoup(resp.text, 'html5lib')
-    img_count = 0
+    img_count = 1
     while True:
-        if not soup.find_all('img')[1]['src'] in IMG.values():
-            IMG[img_count] = soup.find_all('img')[1]['src']
+        if not soup.find_all('img')[1]['src'] in IMFS.values():
+            IMFS[img_count] = soup.find_all('img')[1]['src']
+            #
             img_url = soup.find_all(
-                'img')[1].parent.parent.next_sibling.find('a')['href']
+                'img')[1].parent.parent.next_sibling.find_all('a')[1]['href']
             resp = session.get(BASE_URL+img_url)
             soup = BeautifulSoup(resp.text, 'html5lib')
+            img_count += 1
         else:
             print('all found')
             break
-    print(IMG)
+        if img_count > 10:
+            break
+    return IMFS
+
+
+def full_auto():
+    ALL_DATA = {}
+    soup = LOGGER(USERNAME, PASSWORD)
+    JAZO = soup.find('input', {'name': 'jazoest'})['value']
+    FBDTSG = soup.find('input', {'name': 'fb_dtsg'})['value']
+    FLOW = soup.find('input', {'name': 'flow'})['value']
+    NUXSOURCE = soup.find('input', {'name': 'nux_source'})['value']
+    form_data = {
+        'fb_dtsg': FBDTSG,
+        'jazoest': JAZO,
+        'flow': FLOW,
+        'nux_source': NUXSOURCE
+    }
+    session.headers.update({'authority': 'mbasic.facebook.com'})
+    resp = session.post(LOGIN_URL, data=form_data)
+    soup = BeautifulSoup(resp.text, 'html5lib')
+    st = soup.find('a')['href']
+    num = 0
+    if str.split('refid')[-1]:
+        num = st.split('refid=')[-1]
+
+    STRING = '台大百大正妹'
+    STRING = str(STRING.encode('utf-8'))[2:-1]
+    # search
+    for i in range(1, 10):
+        NUMBER = str(i)
+        STRING = STRING.replace('\\x', '%')
+        SEARCH_URL = 'https://mbasic.facebook.com/hashtag/'+'台大百大正妹ntu100beauty'+NUMBER
+        PARAMS = {
+            'refid': num,
+            'query': ('#'+STRING+NUMBER)
+        }
+        ALL_DATA[i] = post_scraper(search_url=SEARCH_URL, query_params=PARAMS)
+        session.get(BASE_URL)
+    time.sleep(0.5)
+    return ALL_DATA
+
+
+if __name__ == '__main__':
+    ALL_DATA = full_auto()
+    print(ALL_DATA)
 
 
 '''
