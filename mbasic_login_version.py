@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup
 import requests
-import json
 import time
 
 
@@ -105,6 +104,7 @@ def full_auto():
     STRING = '台大百大正妹'
     STRING = str(STRING.encode('utf-8'))[2:-1]
     # search
+    # the range of searching posts
     for i in range(1, 10):
         NUMBER = str(i)
         STRING = STRING.replace('\\x', '%')
