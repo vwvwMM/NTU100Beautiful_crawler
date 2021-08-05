@@ -79,7 +79,7 @@ def post_scraper(search_url, query_params):
 
 
 def full_auto():
-    ALL_DATA = {}
+    ALL_DATA = []
     soup = LOGGER(USERNAME, PASSWORD)
     JAZO = soup.find('input', {'name': 'jazoest'})['value']
     FBDTSG = soup.find('input', {'name': 'fb_dtsg'})['value']
@@ -111,7 +111,7 @@ def full_auto():
             'refid': num,
             'query': ('#'+STRING+NUMBER)
         }
-        ALL_DATA['beauty'+str(i)] = post_scraper(search_url=SEARCH_URL, query_params=PARAMS)
+        ALL_DATA.append(post_scraper(search_url=SEARCH_URL, query_params=PARAMS))
         session.get(BASE_URL)
     time.sleep(0.5)
     return ALL_DATA
