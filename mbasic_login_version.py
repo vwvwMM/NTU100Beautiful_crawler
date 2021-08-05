@@ -8,7 +8,7 @@ LOGIN_URL = 'https://mbasic.facebook.com/login/device-based/regular/login/?refsr
 USERNAME = 'ttttrickortreat@gmail.com'
 PASSWORD = 'Eric0620eric'
 
-posts_to_scrape=5
+posts_to_scrape = 5
 
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36 Edg/92.0.902.62'
 session = requests.Session()
@@ -52,12 +52,11 @@ def post_scraper(search_url, query_params):
     soup = BeautifulSoup(resp.text, 'html.parser')
     IMFS = {}
     if soup.find('h3'):
-        IMFS[0] = soup.find('div', {'id': 'objects_container'}).find_all('a')[
+        IMFS['description'] = soup.find('div', {'id': 'objects_container'}).find_all('a')[
             1].parent.next_sibling.text
     else:
-        IMFS[0] = 'deleted post'
-        print('This post has been deleted.')
-        return IMFS
+        print('this post is deleted')
+        return None
     # use second pic because sometimes the first links to other posts
     img_url = soup.paragraph = soup.find('div', {'id': 'objects_container'}).find_all(
         'a')[1].parent.parent.parent.parent.next_sibling.find_all('a')[1]['href']
