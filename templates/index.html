@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Home</title>
+{% endblock %}
+
+{% block body %}
+<h1>Home page</h1>
+<img src="{{pic}}" alt="logo">
+<a href="/randpick" method='POST' >pick</a>
+
+{% endblock %}
