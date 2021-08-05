@@ -13,7 +13,6 @@ class Beauty(db.Model):
     pictures = db.Column(db.PickleType(), nullable=False)
     likes = db.Column(db.Integer)
     comments = db.Column(db.Integer)
-    number = db.Column(db.Integer)
     gender = db.Column(db.String)
 
     def __repr__(self):

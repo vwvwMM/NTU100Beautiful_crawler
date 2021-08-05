@@ -50,7 +50,7 @@ def post_scraper(search_url, query_params):
 
     resp = session.get(search_url, params=query_params)
     soup = BeautifulSoup(resp.text, 'html.parser')
-    IMFS = {}
+    IMFS = {'pictures':[]}
     if soup.find('h3'):
         IMFS['description'] = soup.find('div', {'id': 'objects_container'}).find_all('a')[
             1].parent.next_sibling.text
@@ -62,20 +62,18 @@ def post_scraper(search_url, query_params):
         'a')[1].parent.parent.parent.parent.next_sibling.find_all('a')[1]['href']
     resp = session.get(BASE_URL+img_url)
     soup = BeautifulSoup(resp.text, 'html.parser')
-    img_count = 1
     while True:
-        if not soup.find_all('img')[1]['src'] in IMFS.values():
-            IMFS[img_count] = soup.find_all('img')[1]['src']
+        if not soup.find_all('img')[1]['src'] in IMFS['pictures']:
+            IMFS['pictures'].append(soup.find_all('img')[1]['src'])
             #
             img_url = soup.find_all(
                 'img')[1].parent.parent.next_sibling.find_all('a')[1]['href']
             resp = session.get(BASE_URL+img_url)
             soup = BeautifulSoup(resp.text, 'html.parser')
-            img_count += 1
         else:
             print('all found')
             break
-        if img_count > 10:
+        if len(IMFS['pictures']) > 10:
             break
     return IMFS
 
@@ -113,7 +111,7 @@ def full_auto():
             'refid': num,
             'query': ('#'+STRING+NUMBER)
         }
-        ALL_DATA[i] = post_scraper(search_url=SEARCH_URL, query_params=PARAMS)
+        ALL_DATA['beauty'+str(i)] = post_scraper(search_url=SEARCH_URL, query_params=PARAMS)
         session.get(BASE_URL)
     time.sleep(0.5)
     return ALL_DATA
